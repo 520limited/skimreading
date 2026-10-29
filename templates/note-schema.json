@@ -1,0 +1,380 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LiteratureReadingNote",
+  "description": "Structured notes for an academic paper, v3.0 fast briefing — page-grounded, 2-4 verified key figures, QA decisions required only for embedded assets",
+  "type": "object",
+  "required": ["id", "markdown_file", "parse_started_at", "metadata", "reading_purpose", "framework", "method_deep_dive", "results_discussion", "strengths", "learnings", "extracted_assets", "created_at"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "YYYYMMDDHHMM_NameSlug; must match the output folder name"
+    },
+    "markdown_file": {
+      "type": "string",
+      "description": "Markdown report filename; should be YYYYMMDDHHMM.md"
+    },
+    "parse_started_at": {
+      "type": "string",
+      "description": "Local parse start timestamp, format YYYYMMDDHHMM"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["title", "first_author", "journal", "year"],
+      "properties": {
+        "title": {"type": "string"},
+        "title_cn": {"type": "string"},
+        "first_author": {"type": "string"},
+        "corresponding_author": {"type": "string"},
+        "affiliation": {"type": "string"},
+        "affiliation_cn": {"type": "string"},
+        "journal": {"type": "string"},
+        "doi": {"type": "string"},
+        "year": {"type": "integer"},
+        "keywords": {"type": "array", "items": {"type": "string"}, "minItems": 3},
+        "language": {"type": "string", "enum": ["en", "zh", "other"]},
+        "paper_type": {"type": "string", "enum": ["research_article", "review", "short_communication", "theoretical", "other"]},
+        "total_pages": {"type": "integer", "description": "Total number of pages in the PDF"}
+      }
+    },
+    "reading_purpose": {
+      "type": "string",
+      "enum": ["standard"]
+    },
+    "translation_qa": {
+      "type": "object",
+      "properties": {
+        "source_language": {"type": "string", "enum": ["en", "zh", "other"]},
+        "glossary": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "term_original": {"type": "string"},
+              "term_cn": {"type": "string"},
+              "policy": {"type": "string", "enum": ["translate", "keep_english", "bilingual"]},
+              "reason": {"type": "string"},
+              "page": {"type": "integer"}
+            }
+          }
+        },
+        "translation_risks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {"type": "string"},
+              "risk": {"type": "string"},
+              "page": {"type": "integer"}
+            }
+          }
+        },
+        "preserved_original_sentences": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "original": {"type": "string"},
+              "explanation_cn": {"type": "string"},
+              "context": {"type": "string"},
+              "page": {"type": "integer"}
+            }
+          }
+        }
+      }
+    },
+    "framework": {
+      "type": "object",
+      "required": ["background", "objective", "conclusion", "innovation"],
+      "properties": {
+        "background": {"type": "string", "description": "Research background (Chinese). Include [p.X] markers."},
+        "objective": {"type": "string", "description": "Research objective and innovation. Include [p.X] markers."},
+        "conclusion": {"type": "string", "description": "Main findings. Include [p.X] markers."},
+        "innovation": {"type": "string", "description": "What's new. Include [p.X] markers."}
+      }
+    },
+    "method_deep_dive": {
+      "type": "object",
+      "required": ["problem_method_map", "architecture_decomposition", "innovation_chain", "ablation_interpretation", "transferability"],
+      "properties": {
+        "problem_method_map": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["pain_point", "design", "mechanism", "evidence_page"],
+            "properties": {
+              "pain_point": {"type": "string"},
+              "design": {"type": "string"},
+              "mechanism": {"type": "string"},
+              "evidence_page": {"type": "integer"}
+            }
+          },
+          "minItems": 2
+        },
+        "architecture_decomposition": {"type": "string", "description": "Baseline, changed modules, placement, inputs/outputs with page markers."},
+        "method_cards": {
+          "type": "array",
+          "description": "Structured method modules for stable reuse and comparison.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "module": {"type": "string"},
+              "input": {"type": "string"},
+              "operation": {"type": "string"},
+              "output": {"type": "string"},
+              "evidence_page": {"type": "integer"},
+              "role": {"type": "string"}
+            }
+          }
+        },
+        "innovation_chain": {"type": "string", "description": "Causal explanation of the method and innovation chain."},
+        "innovation_evidence_alignment": {
+          "type": "array",
+          "description": "Innovation claims aligned to figures, tables, ablations, or source pages.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "claim": {"type": "string"},
+              "evidence": {"type": "string"},
+              "support_strength": {"type": "string", "enum": ["strong", "medium", "weak"]},
+              "notes": {"type": "string"}
+            }
+          }
+        },
+        "formula_or_loss_intuition": {"type": "string"},
+        "ablation_interpretation": {"type": "string"},
+        "transferability": {"type": "string"}
+      }
+    },
+    "results_discussion": {
+      "type": "object",
+      "required": ["key_figures", "mechanism_chain"],
+      "properties": {
+        "key_figures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["ref", "page", "screenshot", "description", "insight"],
+            "properties": {
+              "ref": {"type": "string", "description": "Figure label, e.g. 'Fig. 1'"},
+              "title": {"type": "string"},
+              "page": {"type": "integer", "description": "Page number where figure appears"},
+              "screenshot": {"type": "string", "description": "Relative path: figures/figX_pY.png"},
+              "description": {"type": "string"},
+              "insight": {"type": "string"}
+            }
+          },
+          "minItems": 2,
+          "maxItems": 8
+        },
+        "experiment_figures": {
+          "type": "array",
+          "description": "Optional. Only needed for embedded experimental figures; unembedded candidates require no card or exclusion.",
+          "items": {
+            "type": "object",
+            "required": ["ref", "page", "screenshot", "description", "result", "interpretation", "qa_status"],
+            "properties": {
+              "ref": {"type": "string"},
+              "page": {"type": "integer"},
+              "screenshot": {"type": "string"},
+              "description": {"type": "string"},
+              "result": {"type": "string"},
+              "interpretation": {"type": "string"},
+              "qa_status": {"type": "string", "enum": ["verified"]}
+            }
+          }
+        },
+        "experiment_figure_exclusions": {
+          "type": "array",
+          "description": "Optional in v3.0; only for embedded assets you deliberately mark excluded.",
+          "items": {
+            "type": "object",
+            "required": ["path", "ref", "page", "reason"],
+            "properties": {
+              "path": {"type": "string"},
+              "ref": {"type": "string"},
+              "page": {"type": "integer"},
+              "reason": {"type": "string"}
+            }
+          }
+        },
+        "key_formulas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["ref", "page", "screenshot", "explanation"],
+            "properties": {
+              "ref": {"type": "string", "description": "Formula label/number"},
+              "page": {"type": "integer"},
+              "screenshot": {"type": "string", "description": "Relative path: figures/eq_X_pY.png"},
+              "text": {"type": "string", "description": "Optional natural-language formula description; never store a raw equation here."},
+              "latex": {"type": "string", "description": "Optional LaTeX transcription only when high-confidence and rendered as MathJax in Markdown."},
+              "transcription_confidence": {"type": "string", "enum": ["high", "medium", "low"]},
+              "explanation": {"type": "string", "description": "One-sentence explanation in Chinese"}
+            }
+          },
+          "description": "Key formulas keep page-anchored screenshots and explanations; optional high-confidence LaTeX must render in a standalone formula card."
+        },
+        "mechanism_chain": {
+          "type": "string",
+          "description": "A→B→C logical chain with page references"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {"type": "string"},
+              "page": {"type": "integer"}
+            }
+          }
+        },
+        "future_work": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {"type": "string"},
+              "page": {"type": "integer"}
+            }
+          }
+        }
+      }
+    },
+    "strengths": {
+      "type": "object",
+      "required": ["innovation", "logic", "method"],
+      "properties": {
+        "innovation": {"type": "object", "properties": {"comment": {"type": "string"}, "page": {"type": "integer"}}},
+        "logic": {"type": "object", "properties": {"comment": {"type": "string"}, "page": {"type": "integer"}}},
+        "method": {"type": "object", "properties": {"comment": {"type": "string"}, "page": {"type": "integer"}}},
+        "writing": {"type": "object", "properties": {"comment": {"type": "string"}, "page": {"type": "integer"}}},
+        "unmentioned_weaknesses": {"type": "string"}
+      }
+    },
+    "learnings": {
+      "type": "object",
+      "required": ["one_idea", "two_figures", "five_sentences"],
+      "properties": {
+        "one_idea": {"type": "string", "minLength": 50},
+        "two_figures": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["ref", "page", "whats_good", "how_to_apply"],
+            "properties": {
+              "ref": {"type": "string"},
+              "page": {"type": "integer"},
+              "screenshot": {"type": "string", "description": "Relative path: figures/XXX.png"},
+              "whats_good": {"type": "string"},
+              "how_to_apply": {"type": "string"}
+            }
+          }
+        },
+        "five_sentences": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "required": ["original", "page", "context", "why_good"],
+            "properties": {
+              "original": {"type": "string"},
+              "page": {"type": "integer"},
+              "context": {"type": "string"},
+              "why_good": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "extracted_assets": {
+      "type": "object",
+      "description": "List of all extracted figures, charts, and formula screenshots",
+      "required": ["total_count", "files"],
+      "properties": {
+        "total_count": {"type": "integer"},
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {"type": "string", "description": "Relative path: figures/XXX.png"},
+              "type": {"type": "string", "enum": ["figure", "table", "formula", "chart"]},
+              "page": {"type": "integer"},
+              "description": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "personal_notes": {
+      "type": "object",
+      "properties": {
+        "tags": {"type": "array", "items": {"type": "string"}},
+        "connection_to_my_research": {"type": "string"},
+        "follow_up_readings": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "schema_ok": {"type": ["boolean", "null"]},
+        "assets_verified": {"type": ["boolean", "null"]},
+        "validated_at": {"type": ["string", "null"], "format": "date-time"},
+        "validator": {"type": ["string", "null"]}
+      }
+    },
+    "visual_qa": {
+      "type": "object",
+      "properties": {
+        "contact_sheets": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Relative paths to auto-generated QA contact sheets"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pass", "warn", "recrop", "unavailable"]
+        },
+        "low_confidence_assets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ref": {"type": "string"},
+              "path": {"type": "string"},
+              "page": {"type": "integer"},
+              "reason": {"type": "string"}
+            }
+          }
+        },
+        "asset_decisions": {
+          "type": "array",
+          "description": "v3.0: required only for assets actually embedded in the Markdown report. Unused extraction candidates need no decision.",
+          "items": {
+            "type": "object",
+            "required": ["path", "ref", "page", "status", "classification", "caption_match", "body_complete", "content_clean", "reason"],
+            "properties": {
+              "path": {"type": "string"},
+              "ref": {"type": "string"},
+              "page": {"type": "integer"},
+              "status": {"type": "string", "enum": ["verified", "recrop", "excluded"]},
+              "classification": {"type": "string", "enum": ["experiment", "non_experiment", "table"]},
+              "caption_match": {"type": "boolean"},
+              "body_complete": {"type": "boolean"},
+              "content_clean": {"type": "boolean"},
+              "reason": {"type": "string"}
+            }
+          }
+        },
+        "notes": {"type": "string"}
+      }
+    }
+  }
+}

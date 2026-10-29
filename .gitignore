@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Generated notes (never commit your literature notes)
+skimreading_notes/
+index.json
+glossary.json
+pipeline_state.json
+
+# OS noise
+Thumbs.db
+desktop.ini
+
+# Local scratch
+tmp/
+*.tmp

@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "skill": "skimreading",
+  "python": {
+    "minimum_version": "3.10",
+    "required": true
+  },
+  "python_packages": [
+    {
+      "distribution": "PyMuPDF",
+      "import": "fitz",
+      "required": true,
+      "purpose": "PDF text extraction, page mapping, rendering, and crop generation"
+    },
+    {
+      "distribution": "Pillow",
+      "import": "PIL",
+      "required": true,
+      "purpose": "image quality checks and QA contact sheets"
+    },
+    {
+      "distribution": "jsonschema",
+      "import": "jsonschema",
+      "required": true,
+      "purpose": "note.json schema validation"
+    }
+  ],
+  "executables": [
+    {
+      "name": "pdftoppm",
+      "distribution": "Poppler",
+      "required": false,
+      "purpose": "optional external PDF rendering fallback"
+    },
+    {
+      "name": "pdftotext",
+      "distribution": "Poppler",
+      "required": false,
+      "purpose": "optional external text extraction fallback"
+    },
+    {
+      "name": "pdfinfo",
+      "distribution": "Poppler",
+      "required": false,
+      "purpose": "optional PDF metadata inspection fallback"
+    }
+  ],
+  "install": {
+    "python_packages": "python -m pip install -r requirements.txt",
+    "python_packages_direct": "python -m pip install pymupdf pillow jsonschema",
+    "poppler_windows": "winget install oschwartz10612.Poppler",
+    "poppler_note": "The current pipeline uses PyMuPDF for its primary path; Poppler is recommended for fallback compatibility and is not a hard blocker."
+  }
+}
