@@ -42,6 +42,37 @@ Markdown 文件名只保留时间戳，如 `202607212349.md`。写作语言为�
    不用为 30 张候选图逐个写 9 字段决策。
 3. **一张图只分析一次**。不要在「关键图表」和「实验图」两处重复描述同一张图。
 
+### 第四铁律：读图次数预算（实测最耗时的一步）
+
+每次 `read_image` 都是几秒到几十秒，而 write/finalize 几乎不占时间。**单次笔记的总读图次数不得超过 8 次**，
+否则必然超时。分配如下：
+
+| 用途 | 次数 |
+|---|---|
+| 联系表（一次看完所有候选） | 1 |
+| 逐张核对待嵌入图 | 3–5（**每张只看一次**） |
+| 兜底重裁复查 | ≤2 |
+
+反面教训（2026-10-30 实测 35 分钟仍未达标）：prep 脚本只有 6.7 秒，真正的开销是
+**15 次 read_image**——公式被反复裁了 8 次、每裁一次都要重读验证。避免方式：
+
+- **公式一律用 `scripts/crop_display_equations.py` 一次批量裁完**，它锚定公式编号行并向上扩展求和/分式的上下限，
+  不再靠手工试坐标。绝不要为一条公式写一个脚本、裁一次、读一次、再调一次。
+- 图片类裁剪先用脚本产出，**只在联系表里视觉筛一遍**，只对最终要嵌入的那几张逐张打开确认。
+- 若某张图裁坏了，最多修一次；第二次仍不对就换一张候选图或改用整页截图，不要进入无限微调。
+
+### 第五铁律：先跑校验器，再写正文
+
+`check_text_quality.py` 与 `check_formula_quality.py` 的错误**全部是可以在写作时避免的**。
+写完 note.json 后先跑一次 `finalize`，如果出现"raw formula-like text"或"complete formula appears in a
+Markdown table"，说明写作阶段就违反了规则，当场改一次；**不要等到 finalize 之后再来回改**。
+
+已知的书写约束（照此写，可一次通过）：
+
+- 反引号 `` `field_name` `` 内部的下划线会被判为下标 → 字段名/文件名尽量不放反引号内，或用连字符写法。
+- 表格单元格**不得**写完整公式（含 `=` 的式子）→ 单元格只写自然语言或"见公式卡片 F3"。
+- 正文里的每个 `$...$` 必须成对闭合；不要出现裸 `_{i}`、`^{m}`、`X_global` 这类未包裹写法。
+
 ## 触发流程
 
 ### 1. 确定输入
@@ -65,6 +96,15 @@ python scripts/run_lit_skim.py prep "<paper.pdf>" "<notes-root>" --name "<标题
 - `figures/*.png` —— 图表/公式裁切候选（DPI 220，可直接嵌入）。
 - `figures/_qa_contact_sheet*.png` —— 缩略图联系表，一次看完所有候选。
 - `asset_manifest.json` —— 每个资产的 `ref`/`caption`/`page`/`confidence`/`crop_quality_status`。
+
+**公式必须单独批量裁**（自动候选常截断上下限，手工试坐标会烧掉十几次读图）：
+
+```bash
+python scripts/crop_display_equations.py "<paper.pdf>" "<note_dir>/figures" --dpi 320
+```
+
+它锚定每个公式编号行，向上合并同行与被除式/求和限所在的行，一次产出全部 `eq_<num>_p<page>.png`，
+带 4pt 内边距且不牵连相邻正文。跑完后**只对要嵌入的那 2–4 条公式各看一眼**即可。
 
 确实需要逐页看图时再加：
 
@@ -135,14 +175,31 @@ Markdown 报告必须包含这 9 节：
 `note.json` 必须符合 `templates/note-schema.json`。不要手写伪造的 validation 字段，
 `finalize` 会写入。
 
-### 6. 校验、索引、清理
+### 6. 校验、索引、导出 PDF、清理
 
 ```bash
-python scripts/run_lit_skim.py finalize "<note_dir>" --notes-root "<notes-root>" --skill-version 3.0
+python scripts/run_lit_skim.py finalize "<note_dir>" --notes-root "<notes-root>" --skill-version 3.1
 ```
 
 它依次刷新联系表、跑公式质检、校验 note.json、跑文本质检、更新 `index.json`、
 `glossary.json`、`pipeline_state.json`。**校验错误必须修完再汇报。**
+
+**校验通过后必须导出 PDF**（交付物是 Markdown + PDF 两份，缺一不可）：
+
+```bash
+python scripts/export_note_pdf.py "<note_dir>"
+```
+
+脚本自动：找 `note.json` 声明的 md → 保护所有 `$...$` / `$$...$$` 不被 Markdown 吃掉 →
+用本地缓存的 MathJax（首次自动下载到临时目录，之后复用）同步渲染 → Chrome 无头打印 A4 →
+**打印完自动回读 PDF 检查 LaTeX 残留**，残留非零就返回 `ok: false`。
+
+产出 `<note_dir>/<时间戳>.pdf`，并在结果里报告 `pages`、`images`、`latex_remnants`。
+三项都应合理（`latex_remnants` 必须为 0）。HTML 中间文件自动删除，加 `--keep-html` 可保留排查。
+
+遇到 `ok: false` 时看 `error` 字段：
+- `MathJax did not typeset` → 本机连不上 CDN 且无缓存，手工下载 `tex-svg.js` 后用 `--cache-dir` 指定目录。
+- `no Chrome/Edge binary found` → 装 Chrome 或用 `--cache-dir` 无关，需有浏览器。
 
 最后删临时文件：
 
@@ -150,7 +207,8 @@ python scripts/run_lit_skim.py finalize "<note_dir>" --notes-root "<notes-root>"
 rm -rf "<note_dir>/tmp_pages"
 ```
 
-保留 `asset_manifest.json`（记录图表来源）。
+保留 `asset_manifest.json`（记录图表来源）和导出的 `.pdf`。
+
 
 ## 边界情况
 
@@ -165,11 +223,27 @@ rm -rf "<note_dir>/tmp_pages"
 
 ## 汇报格式
 
-不超过 20 行：论文标题与笔记路径、一句话发现、1-2-5 要点、校验结果、
-视觉 QA 状态（`pass`/`warn`/`recrop`/`unavailable`）、未解决的限制。
+不超过 20 行：论文标题、**笔记路径与 PDF 路径**、一句话发现、1-2-5 要点、校验结果、
+PDF 导出的 `pages` / `images` / `latex_remnants`、视觉 QA 状态
+（`pass`/`warn`/`recrop`/`unavailable`）、未解决的限制。
 
 ## 版本
 
+- v3.2 (2026-10-30): **补齐交付物**。此前技能只产出 Markdown + JSON，PDF 是每次现写脚本
+  临时做的，知识未沉淀——同样的三个坑（Markdown 吞掉 LaTeX 下标、CDN 异步 MathJax 打印时
+  未完成渲染、相对图片路径失效）每次都重踩。本版把 `scripts/export_note_pdf.py` 固化进流程：
+  先保护 `$...$` 与代码块再做 Markdown 转换，用本地缓存的 MathJax 同步渲染，Chrome 无头打印后
+  **自动回读 PDF 校验 LaTeX 残留**。实测 MGLL 论文一次通过：15 页 / 14 图 / 残留 0。
+  SKILL.md 第 6 步改为「校验、索引、导出 PDF、清理」，PDF 成为必交产物。
+- v3.1 (2026-10-30): **实测整改版**。上一版把预算写成文字但没解决真正的瓶颈。
+  实测一篇 40 页论文耗时 35 分钟，而 prep 脚本仅 6.7 秒——开销全在 **15 次 read_image**
+  （公式被反复手工裁了 8 轮、每轮重读验证）。本版措施：
+  ①新增 `scripts/crop_display_equations.py`，锚定公式编号行并向上合并求和/分式上下限，
+  一次批量裁完全部编号公式，取代手工试坐标；
+  ②`check_text_quality.py` 修正两处误报来源——反引号内标识符（`caption_match`、文件名）的下划线
+  不再被当作下标，Markdown 表格行不再重复报公式警报（完整公式由 check_formula_quality 负责阻断）；
+  实测同一篇笔记的误报警告从 11 条降为 0，省掉一整轮返工；
+  ③新增「第四铁律：读图次数预算 ≤8 次」与「第五铁律：先跑校验器再写正文」，把两条硬规则写进流程。
 - v3.0 (2026-10-29): **提速版**。默认不渲染整页 PNG（省 20MB+ 与大量图像读取）；
   只对要嵌入的 2–4 张图做视觉核对与 QA 登记，不再为全部 30 个候选资产逐一决策；
   取消「关键图表」与「实验图」对同一张图的重复分析，合并为单一卡片；

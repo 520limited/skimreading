@@ -8,10 +8,13 @@ import json
 import re
 from pathlib import Path
 
+from markdown_formula import markdown_table_lines
+
 
 OBSIDIAN_IMAGE_RE = re.compile(r"!\[\[([^\]]+)\]\]")
 MD_IMAGE_RE = re.compile(r"!\[[^\]]*\]\(([^)]+)\)")
 FENCED_CODE_RE = re.compile(r"```[^\n]*\n(.*?)```", re.DOTALL)
+INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
 MATH_BLOCK_RE = re.compile(r"\$\$.*?\$\$|\$[^$\n]+\$", re.DOTALL)
 FORMULA_LIKE_RE = re.compile(r"([A-Za-zαβγλΔθ]_[A-Za-z0-9αβγλΔθ]|\^[{(]|\{[A-Za-z0-9_+\-*/\\\sαβγλΔθ]+\}|\\[A-Za-z]+|[A-Za-zαβγλΔθ]\s*=|[αβγλΔθ]_[A-Za-z0-9])")
 CODE_LIKE_RE = re.compile(r"\b(def|class|import|for|while|return|function|const|let|var)\b")
@@ -83,8 +86,20 @@ def check_formula_code_blocks(md_text: str, warnings: list[str]) -> None:
 def check_inline_formula_text(md_text: str, warnings: list[str]) -> None:
     stripped = FENCED_CODE_RE.sub("", md_text)
     stripped = MATH_BLOCK_RE.sub("", stripped)
+    # Inline code spans are identifiers, file names and field names such as
+    # `caption_match` or `figures/_qa_contact_sheet_01.png`. The underscore in
+    # those is not a math subscript, so mask them before scanning: otherwise
+    # every backticked identifier raises a false formula warning and the reader
+    # spends a round trip "fixing" prose that was already correct.
+    stripped = INLINE_CODE_RE.sub(lambda m: " " * len(m.group(0)), stripped)
+    table_rows = markdown_table_lines(stripped)
     for line_no, line in enumerate(stripped.splitlines(), start=1):
         if not line.strip() or line.lstrip().startswith("!"):
+            continue
+        # A table cell may legitimately quote a metric like "AUC=0.87"; only
+        # complete standalone equations are a real problem there, and
+        # check_formula_quality.py already blocks those.
+        if line_no in table_rows and "|" in line:
             continue
         if FORMULA_LIKE_RE.search(line):
             warnings.append(f"formula-like raw text outside MathJax at markdown line {line_no}; prefer screenshot or $$...$$ with confidence")
