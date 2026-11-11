@@ -31,6 +31,7 @@ PDF ──▶ scripts/prep ──▶ text + figure candidates ──▶ agent wr
 - [Compatibility](#compatibility)
 - [Repository layout](#repository-layout)
 - [Contributing](#contributing)
+- [Acknowledgements](#acknowledgements)
 - [Citation](#citation)
 - [License](#license)
 
@@ -198,6 +199,18 @@ Full history in [CHANGELOG.md](CHANGELOG.md).
   license = {MIT}
 }
 ```
+
+## Acknowledgements
+
+`skimreading` is derived from the `skimreading` skill in
+[sleep-nobad/literature-reading-skills](https://github.com/sleep-nobad/literature-reading-skills)
+(MIT, © 2026 Literature Reading Skills Contributors). The two-phase workflow, the note folder
+layout, the extraction pipeline, the JSON schemas, and the QA rules originate there; this
+repository adds packaging, CI, documentation, PDF export, batch equation cropping, and the fixes
+listed in the changelog.
+
+Many thanks to the upstream authors for publishing their work openly — it made this skill possible.
+Details in [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md).
 
 ## License
 
@@ -383,6 +396,17 @@ skimreading/
   license = {MIT}
 }
 ```
+
+### 致谢
+
+`skimreading` 派生自
+[sleep-nobad/literature-reading-skills](https://github.com/sleep-nobad/literature-reading-skills)
+仓库中的 `skimreading` 技能（MIT 许可，© 2026 Literature Reading Skills Contributors）。
+两阶段流程、笔记目录结构、抽取管线、JSON schema 与 QA 规则均来自上游；本仓库添加了打包、
+CI、文档、PDF 导出、公式批量裁剪，以及 changelog 中列出的修复。
+
+感谢上游作者公开发布这项工作——没有它就没有这个技能。细节见
+[ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md)。
 
 ### 许可
 

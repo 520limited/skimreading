@@ -8,6 +8,9 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `ACKNOWLEDGMENTS.md`, a README acknowledgements section, and the upstream copyright notice in
+  `LICENSE`: this skill is derived from
+  [sleep-nobad/literature-reading-skills](https://github.com/sleep-nobad/literature-reading-skills).
 - Open-source project scaffolding: CI workflow, issue forms, PR template, Dependabot,
   `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `.editorconfig`, `ruff.toml`.
 - README: badges, table of contents, compatibility matrix, repository layout, citation block,
