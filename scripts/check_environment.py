@@ -16,7 +16,8 @@ import sys
 from pathlib import Path
 
 try:
-    from importlib.metadata import PackageNotFoundError, version as distribution_version
+    from importlib.metadata import PackageNotFoundError
+    from importlib.metadata import version as distribution_version
 except ImportError:  # pragma: no cover - Python 3.10+ normally has importlib.metadata
     PackageNotFoundError = Exception
     distribution_version = None

@@ -11,7 +11,6 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-
 SCRIPT_DIR = Path(__file__).resolve().parent
 SKILL_DIR = SCRIPT_DIR.parent
 DEFAULT_SCHEMA = SKILL_DIR / "templates" / "note-schema.json"

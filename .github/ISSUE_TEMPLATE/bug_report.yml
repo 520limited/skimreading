@@ -1,0 +1,68 @@
+name: Bug report
+description: Something broke or produced a wrong note
+title: "[bug] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please **do not upload copyrighted PDFs** — a link to the arXiv /
+        publisher page is enough.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you run, and what came out instead?
+      placeholder: |
+        Command: python scripts/run_lit_skim.py prep paper.pdf ./notes
+        Expected: note folder with figures/
+        Actual: ...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. pip install -r requirements.txt
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant output
+      description: Paste the error / JSON report. Remove private paths if needed.
+      render: shell
+    validations:
+      required: false
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      placeholder: "3.12.15"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS / environment
+      placeholder: "Ubuntu 24.04 / macOS 15 / Android proot"
+    validations:
+      required: true
+  - type: input
+    id: agent
+    attributes:
+      label: Agent
+      placeholder: "Claude Code / DSH / Codex / Cursor, version if known"
+    validations:
+      required: false
+  - type: textarea
+    id: env-report
+    attributes:
+      label: Dependency report
+      description: Output of `python scripts/check_environment.py --report-only`
+      render: json
+    validations:
+      required: false

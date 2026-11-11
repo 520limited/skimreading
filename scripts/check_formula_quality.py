@@ -10,7 +10,6 @@ from pathlib import Path
 
 from markdown_formula import normalize_formula, validate_markdown_formulas
 
-
 OBSIDIAN_IMAGE_RE = re.compile(r"!\[\[([^\]]+)\]\]")
 MD_IMAGE_RE = re.compile(r"!\[[^\]]*\]\(([^)]+)\)")
 

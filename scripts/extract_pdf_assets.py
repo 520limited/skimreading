@@ -13,10 +13,10 @@ import argparse
 import json
 import re
 import textwrap
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass, field
 from math import ceil
 from pathlib import Path
-from typing import Iterable
 
 import fitz
 

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question / usage help
+    url: https://github.com/520limited/skimreading/discussions
+    about: Ask how to install or run the skill, share a note layout you like.
+  - name: Security issue
+    url: https://github.com/520limited/skimreading/security/advisories/new
+    about: Please report vulnerabilities privately, not in a public issue.

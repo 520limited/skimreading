@@ -1,0 +1,23 @@
+# Lint configuration shared by contributors and CI.
+# Run locally with:  ruff check .
+target-version = "py310"
+line-length = 100
+extend-exclude = ["templates", "skimreading_notes"]
+
+[lint]
+select = [
+  "E4", "E7", "E9",  # real errors: syntax, bad imports, indentation
+  "F",               # pyflakes: unused imports/variables, undefined names
+  "W6",              # deprecated syntax
+  "I",               # import sorting
+  "UP",              # pyupgrade: modern syntax
+  "B",               # bugbear: likely-bug patterns
+]
+ignore = [
+  "E501",  # line length is a formatter's job, not a bug
+  "B008",  # argparse / framework calls in defaults are intentional
+]
+
+[lint.per-file-ignores]
+# The self-test asserts by raising AssertionError on purpose.
+"scripts/formula_self_test.py" = ["S101"]
