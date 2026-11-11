@@ -10,7 +10,6 @@ from pathlib import Path
 
 from markdown_formula import markdown_table_lines
 
-
 OBSIDIAN_IMAGE_RE = re.compile(r"!\[\[([^\]]+)\]\]")
 MD_IMAGE_RE = re.compile(r"!\[[^\]]*\]\(([^)]+)\)")
 FENCED_CODE_RE = re.compile(r"```[^\n]*\n(.*?)```", re.DOTALL)

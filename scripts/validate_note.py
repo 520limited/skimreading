@@ -121,7 +121,9 @@ def validate_figure_coverage(data: dict, manifest: dict, md_image_set: set[str])
         for item in results.get("experiment_figures", [])
         if item.get("screenshot")
     }
-    exclusions = {
+    # Reserved for a future "excluded figures must not be embedded" check; the
+    # schema field exists and manifests already record it, so keep parsing it.
+    _exclusions = {
         normalize_rel(item.get("path", "")): item
         for item in results.get("experiment_figure_exclusions", [])
         if item.get("path")

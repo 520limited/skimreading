@@ -18,7 +18,6 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import sys
 from pathlib import Path
 
 import pymupdf
@@ -57,11 +56,11 @@ def looks_like_math(text: str) -> bool:
         return False
     # The limits of a sum/fraction are often bare fragments on their own row:
     # "N", "X", "2 PN", "i=1 Mi", "m". A short row qualifies only when it also
-    # carries a math glyph or a bare index pattern �?plain lowercase words are
+    # carries a math glyph or a bare index pattern 鈥?plain lowercase words are
     # prose fragments such as "ularity alignment" and must not be swallowed.
     tokens = stripped.split()
     if len(stripped) <= 12 and len(tokens) <= 2:
-        if re.search(r"[=^_∑∏∫]", stripped):
+        if re.search(r"[=^_鈭戔垙鈭玗", stripped):
             return True
         # "2 PN" / "Mi" / "N" / "X": digits plus uppercase glyph runs are the
         # misaligned operators and limits that PyMuPDF emits on their own row.
@@ -73,7 +72,7 @@ def looks_like_math(text: str) -> bool:
     words = re.findall(r"[A-Za-z]{4,}", stripped)
     if len(words) >= 4 and not re.search(r"[=+\-*/^_]", stripped):
         return False
-    math_signals = len(re.findall(r"[=+\-*/^_∑∏∫≤≥≈⊤∥σσταβγλΔθϕ]", stripped))
+    math_signals = len(re.findall(r"[=+\-*/^_鈭戔垙鈭墹鈮モ増鈯も垾蟽蟽蟿伪尾纬位螖胃蠒]", stripped))
     return math_signals >= 2 or bool(re.search(r"[=]", stripped))
 
 

@@ -5,9 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
-
 from dataclasses import asdict
+from pathlib import Path
 
 from extract_pdf_assets import Asset, annotate_asset_quality, build_qa_contact_sheets
 

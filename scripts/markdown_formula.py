@@ -5,7 +5,6 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-
 FENCED_CODE_RE = re.compile(r"```[^\n]*\n.*?```", re.DOTALL)
 FRONTMATTER_RE = re.compile(r"\A---\s*\n.*?\n---\s*(?:\n|$)", re.DOTALL)
 INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
