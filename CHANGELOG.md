@@ -10,7 +10,8 @@ All notable changes to this project are documented here. The format follows
 
 - Open-source project scaffolding: CI workflow, issue forms, PR template, Dependabot,
   `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `.editorconfig`, `ruff.toml`.
-- README: badges, table of contents, compatibility matrix, repository layout, citation block.
+- README: badges, table of contents, compatibility matrix, repository layout, citation block,
+  and a full Chinese version alongside the English one.
 
 ### Fixed
 
