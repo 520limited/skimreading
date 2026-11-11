@@ -18,7 +18,10 @@ from dataclasses import asdict, dataclass, field
 from math import ceil
 from pathlib import Path
 
-import fitz
+try:  # PyMuPDF >= 2.0 exposes the `pymupdf` module; `fitz` is a deprecated alias.
+    import pymupdf as fitz
+except ImportError:  # pragma: no cover - PyMuPDF < 2.0
+    import fitz
 
 try:
     from PIL import Image, ImageDraw, ImageFont

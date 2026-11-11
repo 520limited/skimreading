@@ -15,6 +15,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Fixed
 
+- PyMuPDF 2.x compatibility: `extract_pdf_assets.py` now imports the `pymupdf` module with a
+  fallback to the deprecated `fitz` alias (verified end-to-end on PyMuPDF 2.1).
 - `scripts/crop_display_equations.py` was GB18030-encoded; converted to UTF-8 so tooling and
   non-Chinese locales can read it.
 - Lint findings across `scripts/` (unused imports/variables, import order, deprecated imports).
